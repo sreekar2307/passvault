@@ -8,6 +8,7 @@ var itemsPerPage = 10;
 var fetchedPages = new Set();
 var searchQuery = "";
 var currentPasswordRequest;
+var beEndpoint = "https://ec2-15-206-146-195.ap-south-1.compute.amazonaws.com/api/v1"
 
 function loginNavClick() {
   $("#login").removeClass("hidden");
@@ -103,7 +104,7 @@ function fetchPasswords(page, callback) {
   var token = localStorage.getItem("authToken");
   var offset = (page - 1) * itemsPerPage;
   currentPasswordRequest = $.ajax({
-    url: "http://localhost:9001/api/v1/passwords",
+    url: beEndpoint + "/passwords",
     method: "GET",
     headers: {
       Authorization: "Bearer " + token,
@@ -185,7 +186,7 @@ function storePassword(passwordData) {
   var token = localStorage.getItem("authToken");
 
   $.ajax({
-    url: "http://localhost:9001/api/v1/passwords", // Replace with your backend API URL
+    url: beEndpoint + "/passwords", // Replace with your backend API URL
     method: "POST",
     headers: {
       Authorization: "Bearer " + token,
@@ -226,7 +227,7 @@ function submitCreateuserForm() {
 
 function createUser(createUserData) {
   $.ajax({
-    url: "http://localhost:9001/api/v1/users",
+    url: beEndpoint + "/users",
     method: "POST",
     contentType: "application/json",
     data: createUserData,
@@ -254,7 +255,7 @@ function deletePassword(id) {
   var token = localStorage.getItem("authToken");
 
   $.ajax({
-    url: "http://localhost:9001/api/v1/passwords/" + id,
+    url: beEndpoint + "/passwords/" + id,
     method: "DELETE",
     contentType: "application/json",
     headers: {
@@ -283,7 +284,7 @@ function generatePassword(size, symbols, alphabets, numbers) {
   var token = localStorage.getItem("authToken");
 
   $.ajax({
-    url: "http://localhost:9001/api/v1/generate/passwords",
+    url: beEndpoint + "/generate/passwords",
     method: "POST",
     contentType: "application/json",
     headers: {
@@ -323,7 +324,7 @@ function updatePassword(passwordData, id) {
   var token = localStorage.getItem("authToken");
 
   $.ajax({
-    url: "http://localhost:9001/api/v1/passwords/" + id, // Replace with your backend API URL
+    url: beEndpoint + "/passwords/" + id, // Replace with your backend API URL
     method: "PUT",
     contentType: "application/json",
     headers: {
@@ -407,7 +408,7 @@ $(document).ready(function () {
       showLoader();
       var token = localStorage.getItem("authToken");
       $.ajax({
-        url: "http://localhost:9001/api/v1/import/passwords", // Replace with your backend API URL
+        url: beEndpoint + "/import/passwords", // Replace with your backend API URL
         method: "POST",
         headers: {
           Authorization: "Bearer " + token,
@@ -440,7 +441,7 @@ $(document).ready(function () {
     var password = $("#loginPassword").val();
 
     $.ajax({
-      url: "http://localhost:9001/api/v1/login/users", // Replace with your backend API URL
+      url: beEndpoint + "/login/users", // Replace with your backend API URL
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify({

@@ -28,7 +28,7 @@ func SetupRouter(ctx context.Context) *gin.Engine {
 	router := gin.New()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:  []string{"*"},
+		AllowOrigins:  []string{"https://ec2-15-206-146-195.ap-south-1.compute.amazonaws.com"},
 		AllowHeaders:  []string{"*"},
 		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE"},
 		ExposeHeaders: []string{"Content-Length"},
