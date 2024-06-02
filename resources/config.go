@@ -34,7 +34,6 @@ func initConfig() error {
 	viperObj := viper.New()
 	viperObj.AutomaticEnv()
 	viperObj.SetConfigName("config")
-	viperObj.SetConfigName("secrets")
 	viperObj.AddConfigPath(".")
 	err := viperObj.ReadInConfig()
 	if err != nil {
