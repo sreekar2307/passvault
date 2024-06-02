@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PassVault</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="index.css"/>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" aria-label="Main Navigation">
+      <a class="navbar-brand" href="#">PassVault</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item" id="loginNavItem">
+            <button class="btn nav-link" onclick="loginNavClick()">Login</button>
+          </li>
+          <li class="nav-item" id="signUpNavItem">
+            <button class="btn nav-link" onclick="signUpNavClick()">Sign Up</button>
+          </li>
+          <li class="nav-item position-relative hidden">
+            <button class="btn nav-link" onclick="showGenerateOptions()">
+              Generate Password
+            </button>
+            <div id="generateOptions" class="generate-options hidden">
+              <form id="generatePasswordForm">
+                <div class="form-group">
+                  <label for="passwordSize">Size</label>
+                  <input
+                    min="10"
+                    type="number"
+                    class="form-control"
+                    id="passwordSize"
+                    value="16"
+                  />
+                </div>
+                <div class="form-group form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="symbols"
+                    checked
+                    onchange="checkGenerateConditions()"
+                  />
+                  <label class="form-check-label" for="symbols">Symbols</label>
+                </div>
+                <div class="form-group form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="alphabets"
+                    checked
+                    onchange="checkGenerateConditions()"
+                  />
+                  <label class="form-check-label" for="alphabets"
+                    >Alphabets</label
+                  >
+                </div>
+                <div class="form-group form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="numbers"
+                    checked
+                    onchange="checkGenerateConditions()"
+                  />
+                  <label class="form-check-label" for="numbers">Numbers</label>
+                </div>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  id="generateButton"
+                >
+                  Generate
+                </button>
+              </form>
+              <div id="generatedPassword" class="mt-2"></div>
+            </div>
+          </li>
+          <li class="nav-item hidden">
+            <button class="btn nav-link" onclick="logout()">Logout</button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+      <div id="login" class="my-4">
+        <h3>Login</h3>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input
+              type="text"
+              class="form-control"
+              id="loginEmail"
+              placeholder="Enter email"
+            />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="loginPassword"
+              placeholder="Enter password"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+      </div>
+
+      <div id="create-user" class="my-4 hidden">
+        <h3>Create User</h3>
+        <form id="createUserForm">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input
+              type="text"
+              class="form-control"
+              id="createUserEmail"
+              placeholder="Enter email"
+            />
+          </div>
+          <div class="form-group">
+            <label for="createUsername">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="createUserUsername"
+              placeholder="Enter username"
+            />
+          </div>
+          <div class="form-group">
+            <label for="createPassword">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="createUserPassword"
+              placeholder="Enter password"
+            />
+          </div>
+          <div class="form-group">
+            <label for="createConfirmPassword">Confirm Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="createUserConfirmPassword"
+              placeholder="Confirm password"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Create User</button>
+        </form>
+      </div>
+
+      <div id="password-table" class="my-4 hidden">
+        <h3>Saved Passwords</h3>
+        <div class="d-flex justify-content-start mb-3 align-items-center">
+          <button class="btn btn-success mr-2" onclick="showStoreDrawer()">
+            <i class="fas fa-plus"></i> Add
+          </button>
+          <form
+            id="importPasswordForm"
+            enctype="multipart/form-data"
+            class="d-inline"
+          >
+            <input
+              type="file"
+              id="importCSV"
+              accept=".csv"
+              style="display: none"
+            />
+            <label for="importCSV" class="btn btn-info mb-0 mr-2 align-middle">
+              <i class="fas fa-file-import"></i> Import
+            </label>
+          </form>
+          <input
+            type="text"
+            id="searchInput"
+            class="form-control ml-auto"
+            placeholder="Search passwords..."
+          />
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Website</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="passwordTableBody">
+              <!-- Password entries will be dynamically added here -->
+            </tbody>
+          </table>
+        </div>
+        <nav aria-label="Page navigation">
+          <ul
+            class="pagination justify-content-center"
+            id="paginationControls"
+          ></ul>
+        </nav>
+      </div>
+    </div>
+
+    <div id="updateDrawer" class="offcanvas">
+      <div class="drawer-header">
+        <span class="drawer-title">Update Password</span>
+        <button class="btn drawer-close-icon" onclick="closeUpdateDrawer()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="updatePasswordForm">
+        <div class="form-group">
+          <input type="text" class="form-control" id="updateID" hidden />
+        </div>
+        <div class="form-group">
+          <label for="updateName">Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="updateName"
+            value=""
+            placeholder="Enter name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="updateWebsite">Website</label>
+          <input
+            type="text"
+            class="form-control"
+            id="updateWebsite"
+            placeholder="Enter website"
+          />
+        </div>
+        <div class="form-group">
+          <label for="updateUsername">Username</label>
+          <input
+            type="text"
+            class="form-control"
+            id="updateUsername"
+            placeholder="Enter username"
+          />
+        </div>
+        <div class="form-group">
+          <label for="updatePassword">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="updatePassword"
+            placeholder="Enter password"
+          />
+        </div>
+        <div class="form-group">
+          <label for="updateEmail">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="updateEmail"
+            placeholder="Enter email"
+          />
+        </div>
+        <div class="form-group">
+          <label for="updateNotes">Notes</label>
+          <textarea
+            class="form-control"
+            id="updateNotes"
+            placeholder="Enter notes"
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+      </form>
+    </div>
+
+    <div id="storeDrawer" class="offcanvas">
+      <div class="drawer-header">
+        <span class="drawer-title">Add Password</span>
+        <button class="btn drawer-close-icon" onclick="closeStoreDrawer()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="storePasswordForm">
+        <div class="form-group">
+          <label for="storeName">Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="storeName"
+            placeholder="Enter name"
+          />
+        </div>
+        <div class="form-group">
+          <label for="storeWebsite">Website</label>
+          <input
+            type="text"
+            class="form-control"
+            id="storeWebsite"
+            placeholder="Enter website"
+          />
+        </div>
+        <div class="form-group">
+          <label for="storeUsername">Username</label>
+          <input
+            type="text"
+            class="form-control"
+            id="storeUsername"
+            placeholder="Enter username"
+          />
+        </div>
+        <div class="form-group">
+          <label for="storePassword">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="storePassword"
+            placeholder="Enter password"
+          />
+        </div>
+        <div class="form-group">
+          <label for="storeEmail">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="storeEmail"
+            placeholder="Enter email"
+          />
+        </div>
+        <div class="form-group">
+          <label for="storeNotes">Notes</label>
+          <textarea
+            class="form-control"
+            id="storeNotes"
+            placeholder="Enter notes"
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Store</button>
+      </form>
+    </div>
+
+    <!-- Loader -->
+    <div id="loader" class="loader d-none">
+      <div class="spinner-border text-primary">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

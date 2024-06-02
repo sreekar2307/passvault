@@ -1,0 +1,18 @@
+database:
+  host: postgres
+  port: 5432
+  username: postgres
+  password: password
+  name: passvault
+  max_open_connections: 50
+  max_idle_connections: 10
+  max_idle_connection_time: 1.8e+12
+encryption:
+  keys:
+    - key: a7e05137a86a241fb8686d9468c44019bd2425be45c7c42fcf26ac938ebb0155
+      version: v1
+  auth: 9e4429f6a8335f660ba446d26768ab7a21fa7f1a000ea77960ce738d143ddcbf
+server:
+  port: 9001
+  host: 0.0.0.0
+env: dev

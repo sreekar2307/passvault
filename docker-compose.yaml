@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: passvault
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - passvault_pg_data:/var/lib/postgresql/data/pgdata
+    networks:
+      - app-network
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./website:/var/www/website:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+volumes:
+  passvault_pg_data:
+networks:
+  app-network:
+    driver: bridge
