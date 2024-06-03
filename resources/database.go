@@ -39,14 +39,16 @@ func initDatabaseConn() error {
 	db, err := gorm.Open(postgres.New(postgres.Config{Conn: sqlDB}), &gorm.Config{
 		PrepareStmt:            true,
 		SkipDefaultTransaction: true,
+		DisableAutomaticPing:   true,
 		Logger:                 gormLogger.Default.LogMode(gormLogger.Info),
 	})
 	if err != nil {
 		return err
 	}
 
-	db.Debug()
-
+	if config.GetString(dtos.ConfigKeys.Env) == "dev" {
+		db = db.Debug()
+	}
 	databaseConn = db
 	return nil
 }
