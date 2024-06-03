@@ -8,7 +8,7 @@ var itemsPerPage = 10;
 var fetchedPages = new Set();
 var searchQuery = "";
 var currentPasswordRequest;
-var beEndpoint = "https://ec2-15-206-146-195.ap-south-1.compute.amazonaws.com/api/v1"
+var beEndpoint = "http://ec2-15-206-146-195.ap-south-1.compute.amazonaws.com/api/v1"
 
 function loginNavClick() {
   $("#login").removeClass("hidden");
