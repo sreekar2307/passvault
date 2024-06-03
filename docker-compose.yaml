@@ -29,6 +29,7 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro  # Mount SSL certificates
     ports:
       - "443:443"
+      - "80:80"
     depends_on:
       - backend
     networks:
