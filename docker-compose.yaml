@@ -21,6 +21,8 @@ services:
       - postgres
     networks:
       - app-network
+    ports:
+      - "9001:9001"
   nginx:
     image: nginx:latest
     volumes:
