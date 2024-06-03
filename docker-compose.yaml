@@ -11,6 +11,8 @@ services:
       - passvault_pg_data:/var/lib/postgresql/data/pgdata
     networks:
       - app-network
+    ports:
+      - "5432:5432"
   backend:
     build:
       context: .

@@ -5,6 +5,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
+	"log/slog"
 	"net/http"
 	"passVault/dependency"
 	"passVault/dtos"
@@ -26,6 +27,8 @@ func SetupRouter(ctx context.Context) *gin.Engine {
 
 	// New Gin Engine.
 	router := gin.New()
+
+	router.Use(AccessLogMiddleware())
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:  []string{"https://ec2-15-206-146-195.ap-south-1.compute.amazonaws.com"},
@@ -57,6 +60,37 @@ func SetupRouter(ctx context.Context) *gin.Engine {
 	SetUpUsersEndpoints(v1)
 
 	return router
+}
+
+func AccessLogMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		path := c.Request.URL.Path
+		query := c.Request.URL.RawQuery
+		c.Next()
+		end := time.Now()
+		latency := end.Sub(start)
+
+		fields := []any{
+			slog.Int("status", c.Writer.Status()),
+			slog.String("method", c.Request.Method),
+			slog.String("path", path),
+			slog.String("query", query),
+			slog.String("ip", c.ClientIP()),
+			slog.String("user-agent", c.Request.UserAgent()),
+			slog.Duration("latency", latency),
+			slog.Time("time", end),
+		}
+
+		if len(c.Errors) > 0 {
+			// Append error field if this is an erroneous request.
+			for _, e := range c.Errors.Errors() {
+				slog.Error(e, fields...)
+			}
+		} else {
+			slog.Info("", fields...)
+		}
+	}
 }
 
 func SetUpPasswordsEndpoints(router *gin.RouterGroup) {
