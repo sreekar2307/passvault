@@ -8,7 +8,7 @@ var itemsPerPage = 10;
 var fetchedPages = new Set();
 var searchQuery = "";
 var currentPasswordRequest;
-var beEndpoint = "https://passvault.fun/api/v1"
+var beEndpoint = "https://www.passvault.fun/api/v1"
 
 function loginNavClick() {
   $("#login").removeClass("hidden");

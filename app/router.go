@@ -32,10 +32,10 @@ func SetupRouter(ctx context.Context) *gin.Engine {
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
-			"https://ec2-15-206-146-195.ap-south-1.compute.amazonaws.com",
 			"https://www.passvault.fun",
+			"http://passvault.fun",
+			"https://passvault.fun",
 			"http://www.passvault.fun",
-			"http://ec2-15-206-146-195.ap-south-1.compute.amazonaws.com",
 		},
 		AllowHeaders:  []string{"*"},
 		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE"},
