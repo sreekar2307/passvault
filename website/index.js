@@ -68,7 +68,6 @@ function displayPasswords(passwords) {
     var row = `<tr>
       <td>${password.website}</td>
       <td>${password.username.String}</td>
-      <td>${password.password}</td>
       <td>${password.email.String}</td>
       <td>
           <div class="d-flex">
