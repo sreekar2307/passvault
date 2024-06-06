@@ -2,6 +2,7 @@ package resources
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"io"
@@ -13,7 +14,10 @@ type S3 struct {
 }
 
 func NewS3() S3 {
-	sess := session.Must(session.NewSession())
+	region := "ap-south-1"
+	sess := session.Must(session.NewSession(&aws.Config{
+		Region: &region,
+	}))
 
 	return S3{
 		service: s3.New(sess),
