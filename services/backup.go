@@ -51,13 +51,13 @@ func (b BackUpServiceImpl) BackupDb(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+
+	defer func() {
+		file.Close()
+		os.Remove(dumpFilePath)
+	}()
 
 	if err := b.s3.Push(ctx, config.GetString(dtos.ConfigKeys.DatabaseBackup.Bucket), s3Path, file); err != nil {
-		return err
-	}
-
-	if err := os.Remove(dumpFilePath); err != nil {
 		return err
 	}
 
