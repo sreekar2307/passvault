@@ -57,6 +57,10 @@ func (b BackUpServiceImpl) BackupDb(ctx context.Context) error {
 		return err
 	}
 
+	if err := os.Remove(dumpFilePath); err != nil {
+		return err
+	}
+
 	objects, err := b.s3.List(ctx, config.GetString(dtos.ConfigKeys.DatabaseBackup.Bucket),
 		config.GetString(dtos.ConfigKeys.DatabaseBackup.Location))
 	if err != nil {
