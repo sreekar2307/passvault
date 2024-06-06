@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"passVault/cmd/backup"
 	"passVault/cmd/migrate"
 	"passVault/cmd/server"
 	"syscall"
@@ -38,6 +39,8 @@ func main() {
 		server.Server(ctx, os.Args[2:]...)
 	case "migrate":
 		migrate.Migrate(ctx, os.Args[2:]...)
+	case "backup":
+		backup.Backup(ctx, os.Args[2:]...)
 	default:
 		panic(fmt.Sprintf("%s command not supported", baseCommand))
 	}
