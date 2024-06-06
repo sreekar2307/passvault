@@ -28,6 +28,7 @@ type Dependency struct {
 	UserService     interfaces.UserService
 	EncryptService  interfaces.EncryptService
 	HashService     interfaces.HashService
+	BackupService   interfaces.BackupService
 }
 
 func init() {
@@ -68,6 +69,8 @@ func newDependencies() Dependency {
 		dependencies.EncryptService, dependencies.HashService)
 	dependencies.UserService = services.NewUserService(db, dependencies.EncryptService, dependencies.HashService,
 		dependencies.UserRepo, dependencies.UserSaltRepo)
+
+	dependencies.BackupService = services.NewBackupService(resources.NewS3())
 
 	return dependencies
 }

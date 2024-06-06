@@ -29,14 +29,15 @@ func Backup(ctx context.Context, args ...string) {
 		panic(err)
 	}
 	var (
-		config = resources.Config()
-		today  = time.Now().In(ist).Format("2006-01-02")
-		cmd    = exec.Command("pg_dump", "-U",
+		config   = resources.Config()
+		today    = time.Now().In(ist).Format("2006-01-02")
+		dumpFile = fmt.Sprintf("dump_%s.sql", today)
+		cmd      = exec.Command("pg_dump", "-U",
 			config.GetString(dtos.ConfigKeys.Database.Username),
 			"-h", config.GetString(dtos.ConfigKeys.Database.Host),
 			"-p", config.GetString(dtos.ConfigKeys.Database.Port),
 			"-d", config.GetString(dtos.ConfigKeys.Database.Name),
-			"-f", fmt.Sprintf("dump_%s.sql", today))
+			"-f", dumpFile)
 	)
 	cmd.Env = []string{
 		fmt.Sprintf("PGPASSWORD=%s", config.GetString(dtos.ConfigKeys.Database.Password)),

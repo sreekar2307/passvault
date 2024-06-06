@@ -11,6 +11,11 @@ type DatabaseConfigKeys struct {
 	MaxIdleConnectionTime string
 }
 
+type DatabaseBackupConfigKeys struct {
+	Bucket   string
+	Location string
+}
+
 type EncryptionConfigKeys struct {
 	Key     string `mapstructure:"key"`
 	Version string `mapstructure:"version"`
@@ -27,10 +32,11 @@ type ServerConfigKeys struct {
 }
 
 var ConfigKeys = struct {
-	Database   DatabaseConfigKeys
-	Encryption string
-	Env        string
-	Server     ServerConfigKeys
+	Database       DatabaseConfigKeys
+	Encryption     string
+	Env            string
+	Server         ServerConfigKeys
+	DatabaseBackup DatabaseBackupConfigKeys
 }{
 	Database: DatabaseConfigKeys{
 		Host:                  "database.host",
@@ -48,4 +54,8 @@ var ConfigKeys = struct {
 		Host: "server.host",
 	},
 	Env: "env",
+	DatabaseBackup: DatabaseBackupConfigKeys{
+		Bucket:   "database_backup.bucket",
+		Location: "database_backup.location",
+	},
 }

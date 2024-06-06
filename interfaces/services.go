@@ -34,3 +34,7 @@ type UserService interface {
 	Login(context.Context, dtos.LoginParams) (string, error)
 	ValidateToken(context.Context, string, *models.User) error
 }
+
+type BackupService interface {
+	BackupDb(context.Context) error
+}
