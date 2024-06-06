@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -12,11 +12,14 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
-    <link rel="stylesheet" href="index.css"/>
+    <link rel="stylesheet" href="index.css" />
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light" aria-label="Main Navigation">
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-light"
+      aria-label="Main Navigation"
+    >
       <a class="navbar-brand" href="#">PassVault</a>
       <button
         class="navbar-toggler"
@@ -32,10 +35,14 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item" id="loginNavItem">
-            <button class="btn nav-link" onclick="loginNavClick()">Login</button>
+            <button class="btn nav-link" onclick="loginNavClick()">
+              Login
+            </button>
           </li>
           <li class="nav-item" id="signUpNavItem">
-            <button class="btn nav-link" onclick="signUpNavClick()">Sign Up</button>
+            <button class="btn nav-link" onclick="signUpNavClick()">
+              Sign Up
+            </button>
           </li>
           <li class="nav-item position-relative hidden">
             <button class="btn nav-link" onclick="showGenerateOptions()">
@@ -116,7 +123,7 @@
               placeholder="Enter email"
             />
           </div>
-          <div class="form-group">
+          <div class="form-group position-relative">
             <label for="loginPassword">Password</label>
             <input
               type="password"
@@ -124,6 +131,9 @@
               id="loginPassword"
               placeholder="Enter password"
             />
+            <span id="toggleLoginPassword" class="toggle-password">
+              <i class="fas fa-eye" id="toggleIconLoginPassword"></i>
+            </span>
           </div>
           <button type="submit" class="btn btn-primary">Login</button>
         </form>
@@ -150,7 +160,7 @@
               placeholder="Enter username"
             />
           </div>
-          <div class="form-group">
+          <div class="form-group position-relative">
             <label for="createPassword">Password</label>
             <input
               type="password"
@@ -158,8 +168,11 @@
               id="createUserPassword"
               placeholder="Enter password"
             />
+            <span id="toggleCreateUserPassword" class="toggle-password">
+              <i class="fas fa-eye" id="toggleIconCreateUserPassword"></i>
+            </span>
           </div>
-          <div class="form-group">
+          <div class="form-group position-relative">
             <label for="createConfirmPassword">Confirm Password</label>
             <input
               type="password"
@@ -167,6 +180,12 @@
               id="createUserConfirmPassword"
               placeholder="Confirm password"
             />
+            <span id="toggleCreateUserConfirmPassword" class="toggle-password">
+              <i
+                class="fas fa-eye"
+                id="toggleIconCreateUserConfirmPassword"
+              ></i>
+            </span>
           </div>
           <button type="submit" class="btn btn-primary">Create User</button>
         </form>
@@ -264,7 +283,7 @@
             placeholder="Enter username"
           />
         </div>
-        <div class="form-group">
+        <div class="form-group position-relative">
           <label for="updatePassword">Password</label>
           <input
             type="password"
@@ -272,6 +291,9 @@
             id="updatePassword"
             placeholder="Enter password"
           />
+          <span id="toggleUpdatePassword" class="toggle-password">
+            <i class="fas fa-eye" id="toggleIconUpdatePassword"></i>
+          </span>
         </div>
         <div class="form-group">
           <label for="updateEmail">Email</label>
@@ -329,7 +351,7 @@
             placeholder="Enter username"
           />
         </div>
-        <div class="form-group">
+        <div class="form-group position-relative">
           <label for="storePassword">Password</label>
           <input
             type="password"
@@ -337,6 +359,9 @@
             id="storePassword"
             placeholder="Enter password"
           />
+          <span id="toggleStorePassword" class="toggle-password">
+            <i class="fas fa-eye" id="toggleIconStorePassword"></i>
+          </span>
         </div>
         <div class="form-group">
           <label for="storeEmail">Email</label>

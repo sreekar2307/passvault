@@ -1,14 +1,12 @@
 // global variables
 var passwords = [];
-var userAuthToken;
-var isAuthenticated = false;
 var hiddenElements;
 var currentPage = 1;
 var itemsPerPage = 10;
 var fetchedPages = new Set();
 var searchQuery = "";
 var currentPasswordRequest;
-var beEndpoint = "https://www.passvault.fun/api/v1"
+var beEndpoint = "https://www.passvault.fun/api/v1";
 
 function loginNavClick() {
   $("#login").removeClass("hidden");
@@ -130,8 +128,7 @@ function fetchPasswords(page, callback) {
 function showUpdateDrawer(id) {
   var password = passwords[currentPage - 1].find((p) => p.ID === id);
   if (password) {
-    $("#updateID").val(password.ID),
-      $("#updateName").val(password.name.String);
+    $("#updateID").val(password.ID), $("#updateName").val(password.name.String);
     $("#updateWebsite").val(password.website);
     $("#updateUsername").val(password.username.String);
     $("#updatePassword").val(password.password);
@@ -209,7 +206,7 @@ $("#storePasswordForm").submit(function (e) {
   submitPasswordForm();
 });
 
-$('#createUserForm').submit(function (e) {
+$("#createUserForm").submit(function (e) {
   e.preventDefault();
   submitCreateuserForm();
 });
@@ -220,8 +217,8 @@ function submitCreateuserForm() {
     name: $("#createUserUsername").val(),
     password: $("#createUserPassword").val(),
     confirmPassword: $("#createUserConfirmPassword").val(),
-  })
-  createUser(createUserData)
+  });
+  createUser(createUserData);
 }
 
 function createUser(createUserData) {
@@ -232,7 +229,7 @@ function createUser(createUserData) {
     data: createUserData,
     success: function (response) {
       if (response.token) {
-          postLogin(response.token);
+        postLogin(response.token);
       }
     },
     error: function (jqXHR, textStatus) {
@@ -391,6 +388,51 @@ function searchPasswords(query) {
 $(document).ready(function () {
   if (localStorage.getItem("authToken")) {
     postLogin(localStorage.getItem("authToken"));
+  }
+  const toggleLoginIconSpan = $("#toggleLoginPassword");
+  const toggleCreateUserIconSpan = $("#toggleCreateUserPassword");
+  const toggleCreateUserConfirmIconSpan = $("#toggleCreateUserConfirmPassword");
+  const toggleUpdateIconSpan = $("#toggleUpdatePassword");
+  const toggleStoreIconSpan = $("#toggleStorePassword");
+
+  toggleLoginIconSpan.on("click", function () {
+    const passwordField = $("#loginPassword");
+    const toggleIcon = $("#toggleIconLoginPassword");
+    togglePassWordEye(passwordField, toggleIcon);
+  });
+
+  toggleCreateUserIconSpan.on("click", function () {
+    const passwordField = $("#createUserPassword");
+    const toggleIcon = $("#toggleIconCreateUserPassword");
+    togglePassWordEye(passwordField, toggleIcon);
+  });
+
+  toggleCreateUserConfirmIconSpan.on("click", function () {
+    const passwordField = $("#createUserConfirmPassword");
+    const toggleIcon = $("#toggleIconCreateUserConfirmPassword");
+    togglePassWordEye(passwordField, toggleIcon);
+  });
+
+  toggleUpdateIconSpan.on("click", function () {
+    const passwordField = $("#updatePassword");
+    const toggleIcon = $("#toggleIconUpdatePassword");
+    togglePassWordEye(passwordField, toggleIcon);
+  });
+
+  toggleStoreIconSpan.on("click", function () {
+    const passwordField = $("#storePassword");
+    const toggleIcon = $("#toggleIconStorePassword");
+    togglePassWordEye(passwordField, toggleIcon);
+  });
+
+  function togglePassWordEye(passwordField, toggleIconField) {
+    if (passwordField.attr("type") === "password") {
+      passwordField.attr("type", "text");
+      toggleIconField.removeClass("fa-eye").addClass("fa-eye-slash");
+    } else {
+      passwordField.attr("type", "password");
+      toggleIconField.removeClass("fa-eye-slash").addClass("fa-eye");
+    }
   }
 
   $("#importPasswordForm label").click(function (e) {
