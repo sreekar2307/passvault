@@ -27,17 +27,18 @@ var (
 func (b BackUpServiceImpl) BackupDb(ctx context.Context) error {
 
 	var (
-		config   = resources.Config()
-		today    = time.Now().In(ist).Format("2006-01-02")
-		dumpFile = fmt.Sprintf("/tmp/dump_%s.tar", today)
-		cmd      = exec.Command("pg_dump", "-U",
+		config       = resources.Config()
+		today        = time.Now().In(ist).Format("2006-01-02")
+		dumpFileName = fmt.Sprintf("dump_%s.tar", today)
+		dumpFilePath = fmt.Sprintf("/tmp/%s", dumpFileName)
+		cmd          = exec.Command("pg_dump", "-U",
 			config.GetString(dtos.ConfigKeys.Database.Username),
 			"-h", config.GetString(dtos.ConfigKeys.Database.Host),
 			"-p", config.GetString(dtos.ConfigKeys.Database.Port),
 			"-d", config.GetString(dtos.ConfigKeys.Database.Name),
 			"-F", "tar",
-			"-f", dumpFile)
-		s3Path = fmt.Sprintf("%s/%s.sql", config.GetString(dtos.ConfigKeys.DatabaseBackup.Location), today)
+			"-f", dumpFilePath)
+		s3Path = fmt.Sprintf("%s/%s", config.GetString(dtos.ConfigKeys.DatabaseBackup.Location), dumpFileName)
 	)
 	cmd.Env = []string{
 		fmt.Sprintf("PGPASSWORD=%s", config.GetString(dtos.ConfigKeys.Database.Password)),
@@ -46,7 +47,7 @@ func (b BackUpServiceImpl) BackupDb(ctx context.Context) error {
 		return err
 	}
 
-	file, err := os.Open(dumpFile)
+	file, err := os.Open(dumpFilePath)
 	if err != nil {
 		return err
 	}
