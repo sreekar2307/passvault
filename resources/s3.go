@@ -13,8 +13,7 @@ type S3 struct {
 	service *s3.S3
 }
 
-func NewS3() S3 {
-	region := "ap-south-1"
+func NewS3(region string) S3 {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: &region,
 	}))

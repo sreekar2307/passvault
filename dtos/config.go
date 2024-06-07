@@ -14,6 +14,7 @@ type DatabaseConfigKeys struct {
 type DatabaseBackupConfigKeys struct {
 	Bucket   string
 	Location string
+	Region   string
 }
 
 type EncryptionConfigKeys struct {
@@ -57,5 +58,6 @@ var ConfigKeys = struct {
 	DatabaseBackup: DatabaseBackupConfigKeys{
 		Bucket:   "database_backup.bucket",
 		Location: "database_backup.location",
+		Region:   "database_backup.region",
 	},
 }

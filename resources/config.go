@@ -35,6 +35,7 @@ func initConfig() error {
 	viperObj.AutomaticEnv()
 	viperObj.SetConfigName("config")
 	viperObj.AddConfigPath(".")
+	viperObj.AddConfigPath("/home/ubuntu/passvault")
 	err := viperObj.ReadInConfig()
 	if err != nil {
 		return fmt.Errorf("error reading config file: %w", err)

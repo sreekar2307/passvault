@@ -70,7 +70,9 @@ func newDependencies() Dependency {
 	dependencies.UserService = services.NewUserService(db, dependencies.EncryptService, dependencies.HashService,
 		dependencies.UserRepo, dependencies.UserSaltRepo)
 
-	dependencies.BackupService = services.NewBackupService(resources.NewS3())
+	dependencies.BackupService = services.NewBackupService(
+		resources.NewS3(config.GetString(dtos.ConfigKeys.DatabaseBackup.Region)),
+	)
 
 	return dependencies
 }
