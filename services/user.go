@@ -19,6 +19,7 @@ type UserServiceImpl struct {
 	hashService        interfaces.HashService
 	userRepository     interfaces.UserRepository
 	userSaltRepository interfaces.UserSaltRepository
+	captchaService     interfaces.CaptchaService
 }
 
 func NewUserService(
@@ -27,7 +28,7 @@ func NewUserService(
 	hashService interfaces.HashService,
 	userRepository interfaces.UserRepository,
 	userSaltRepository interfaces.UserSaltRepository,
-
+	captchaService interfaces.CaptchaService,
 ) interfaces.UserService {
 	return UserServiceImpl{
 		db:                 db,
@@ -35,6 +36,7 @@ func NewUserService(
 		userRepository:     userRepository,
 		userSaltRepository: userSaltRepository,
 		hashService:        hashService,
+		captchaService:     captchaService,
 	}
 }
 
@@ -43,6 +45,12 @@ func (u UserServiceImpl) CreateUser(ctx context.Context, params dtos.CreateUserP
 		user     models.User
 		userSalt models.UserSalt
 	)
+	if ok, err := u.captchaService.VerifyToken(ctx, params.Token); err != nil {
+		return "", err
+	} else if !ok {
+		return "", errors.New("invalid captcha")
+	}
+
 	if err := u.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		salt, err := u.encryptionService.GenerateSalt(ctx)
 		if err != nil {
@@ -82,6 +90,12 @@ func (u UserServiceImpl) CreateUser(ctx context.Context, params dtos.CreateUserP
 
 func (u UserServiceImpl) Login(ctx context.Context, params dtos.LoginParams) (string, error) {
 	var user models.User
+
+	if ok, err := u.captchaService.VerifyToken(ctx, params.Token); err != nil {
+		return "", err
+	} else if !ok {
+		return "", errors.New("invalid captcha")
+	}
 
 	if err := u.userRepository.GetUser(ctx, u.db, dtos.GetUserFilter{Email: params.Email}, &user); err != nil {
 		return "", err

@@ -27,6 +27,10 @@ type Encryption struct {
 	Auth string                 `mapstructure:"auth"`
 }
 
+type CaptchaConfigKeys struct {
+	Secret string
+}
+
 type ServerConfigKeys struct {
 	Port string
 	Host string
@@ -38,6 +42,7 @@ var ConfigKeys = struct {
 	Env            string
 	Server         ServerConfigKeys
 	DatabaseBackup DatabaseBackupConfigKeys
+	Captcha        CaptchaConfigKeys
 }{
 	Database: DatabaseConfigKeys{
 		Host:                  "database.host",
@@ -59,5 +64,8 @@ var ConfigKeys = struct {
 		Bucket:   "database_backup.bucket",
 		Location: "database_backup.location",
 		Region:   "database_backup.region",
+	},
+	Captcha: CaptchaConfigKeys{
+		Secret: "captcha.secret",
 	},
 }

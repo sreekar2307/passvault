@@ -13,16 +13,6 @@ services:
       - app-network
     ports:
       - "5432:5432"
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - postgres
-    networks:
-      - app-network
-    ports:
-      - "9001:9001"
 volumes:
   passvault_pg_data:
 networks:

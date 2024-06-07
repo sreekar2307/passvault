@@ -7,6 +7,7 @@ var fetchedPages = new Set();
 var searchQuery = "";
 var currentPasswordRequest;
 var beEndpoint = "https://www.passvault.fun/api/v1";
+var googleCaptchaToken = "6LeWMPMpAAAAALl9Ik6bEJfafcLoo4TX1-2t_atM";
 
 function loginNavClick() {
   $("#login").removeClass("hidden");
@@ -212,30 +213,33 @@ $("#createUserForm").submit(function (e) {
 });
 
 function submitCreateuserForm() {
-  var createUserData = JSON.stringify({
+  var createUserData = {
     email: $("#createUserEmail").val(),
     name: $("#createUserUsername").val(),
     password: $("#createUserPassword").val(),
     confirmPassword: $("#createUserConfirmPassword").val(),
-  });
+  };
   createUser(createUserData);
 }
 
 function createUser(createUserData) {
-  $.ajax({
-    url: beEndpoint + "/users",
-    method: "POST",
-    contentType: "application/json",
-    data: createUserData,
-    success: function (response) {
-      if (response.token) {
-        postLogin(response.token);
-      }
-    },
-    error: function (jqXHR, textStatus) {
-      // Handle error response if needed
-      handleBEAPIError(jqXHR, textStatus);
-    },
+  getCaptchaToken(function (token) {
+    createUserData.token = token;
+    $.ajax({
+      url: beEndpoint + "/users",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(createUserData),
+      success: function (response) {
+        if (response.token) {
+          postLogin(response.token);
+        }
+      },
+      error: function (jqXHR, textStatus) {
+        // Handle error response if needed
+        handleBEAPIError(jqXHR, textStatus);
+      },
+    });
   });
 }
 
@@ -385,6 +389,21 @@ function searchPasswords(query) {
   setPage(1);
 }
 
+function getCaptchaToken(callback) {
+  grecaptcha.ready(function () {
+    grecaptcha
+      .execute(googleCaptchaToken, {
+        action: "submit",
+      })
+      .then(function (token) {
+        callback(token);
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  });
+}
+
 $(document).ready(function () {
   if (localStorage.getItem("authToken")) {
     postLogin(localStorage.getItem("authToken"));
@@ -477,28 +496,30 @@ $(document).ready(function () {
 
   $("#loginForm").submit(function (event) {
     event.preventDefault();
+    getCaptchaToken(function (token) {
+      var email = $("#loginEmail").val();
+      var password = $("#loginPassword").val();
 
-    var email = $("#loginEmail").val();
-    var password = $("#loginPassword").val();
-
-    $.ajax({
-      url: beEndpoint + "/login/users", // Replace with your backend API URL
-      method: "POST",
-      contentType: "application/json",
-      data: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-      success: function (response) {
-        if (response.token) {
-          postLogin(response.token);
-        } else {
+      $.ajax({
+        url: beEndpoint + "/login/users", // Replace with your backend API URL
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+          email: email,
+          password: password,
+          token: token,
+        }),
+        success: function (response) {
+          if (response.token) {
+            postLogin(response.token);
+          } else {
+            alert("Login failed. Please try again.");
+          }
+        },
+        error: function () {
           alert("Login failed. Please try again.");
-        }
-      },
-      error: function () {
-        alert("Login failed. Please try again.");
-      },
+        },
+      });
     });
   });
 });

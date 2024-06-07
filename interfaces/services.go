@@ -38,3 +38,7 @@ type UserService interface {
 type BackupService interface {
 	BackupDb(context.Context) error
 }
+
+type CaptchaService interface {
+	VerifyToken(context.Context, string) (bool, error)
+}

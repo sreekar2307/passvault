@@ -2,6 +2,7 @@ package dependency
 
 import (
 	"gorm.io/gorm"
+	"net/http"
 	"passVault/dtos"
 	"passVault/interfaces"
 	"passVault/repository"
@@ -29,6 +30,7 @@ type Dependency struct {
 	EncryptService  interfaces.EncryptService
 	HashService     interfaces.HashService
 	BackupService   interfaces.BackupService
+	CaptchaService  interfaces.CaptchaService
 }
 
 func init() {
@@ -62,13 +64,13 @@ func newDependencies() Dependency {
 	if err := config.UnmarshalKey(dtos.ConfigKeys.Encryption, &encryption); err != nil {
 		panic(err.Error())
 	}
-
+	dependencies.CaptchaService = services.NewCaptchaService(http.DefaultClient)
 	dependencies.EncryptService = services.NewEncryptionService(db, encryption)
 	dependencies.PasswordService = services.NewPasswordService(db, dependencies.PasswordRepo,
 		dependencies.PasswordGenerationRepo, dependencies.PasswordVersionRepo,
 		dependencies.EncryptService, dependencies.HashService)
 	dependencies.UserService = services.NewUserService(db, dependencies.EncryptService, dependencies.HashService,
-		dependencies.UserRepo, dependencies.UserSaltRepo)
+		dependencies.UserRepo, dependencies.UserSaltRepo, dependencies.CaptchaService)
 
 	dependencies.BackupService = services.NewBackupService(
 		resources.NewS3(config.GetString(dtos.ConfigKeys.DatabaseBackup.Region)),
