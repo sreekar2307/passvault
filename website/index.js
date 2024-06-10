@@ -356,6 +356,7 @@ function logout() {
   if (hiddenElements) {
     hiddenElements.addClass("hidden");
   }
+  sendRemoveTokenToExtension();
   $("#create-user").addClass("hidden");
   $("#login").removeClass("hidden");
   $("#loginNavItem").removeClass("hidden");
@@ -385,6 +386,10 @@ function postLogin(token) {
 
 function sendTokenToExtension(token) {
   window.postMessage({ type: "PASSVAULT_TOKEN", token: token }, "*");
+}
+
+function sendRemoveTokenToExtension() {
+  window.postMessage({ type: "REMOVE_PASSVAULT_TOKEN" }, "*");
 }
 
 function searchPasswords(query) {

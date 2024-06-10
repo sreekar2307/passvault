@@ -32,6 +32,11 @@ window.addEventListener(
       // Store the token using the Chrome Storage API
       chrome.storage.local.set({ authToken: token }, () => {});
     }
+
+    if (event.data.type && event.data.type === "REMOVE_PASSVAULT_TOKEN") {
+      // Store the token using the Chrome Storage API
+      chrome.storage.local.remove("authToken");
+    }
   },
   false,
 );
