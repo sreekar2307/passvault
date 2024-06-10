@@ -36,6 +36,11 @@ type ServerConfigKeys struct {
 	Host string
 }
 
+type LoggerConfigKeys struct {
+	File  string
+	Level string
+}
+
 var ConfigKeys = struct {
 	Database       DatabaseConfigKeys
 	Encryption     string
@@ -43,6 +48,7 @@ var ConfigKeys = struct {
 	Server         ServerConfigKeys
 	DatabaseBackup DatabaseBackupConfigKeys
 	Captcha        CaptchaConfigKeys
+	Logger         LoggerConfigKeys
 }{
 	Database: DatabaseConfigKeys{
 		Host:                  "database.host",
@@ -67,5 +73,9 @@ var ConfigKeys = struct {
 	},
 	Captcha: CaptchaConfigKeys{
 		Secret: "captcha.secret",
+	},
+	Logger: LoggerConfigKeys{
+		File:  "logger.file",
+		Level: "logger.level",
 	},
 }

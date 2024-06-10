@@ -3,19 +3,23 @@ package main
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"os"
 	"os/signal"
 	"passVault/cmd/backup"
 	"passVault/cmd/migrate"
 	"passVault/cmd/server"
+	"passVault/resources"
 	"syscall"
 )
 
 func main() {
+	var (
+		ctx    = context.Background()
+		logger = resources.Logger(ctx)
+	)
 	defer func() {
 		if err := recover(); err != nil {
-			slog.Error("panic occurred in main go-routine ", "error", err)
+			logger.Error("panic occurred in main go-routine ", "error", err)
 		}
 	}()
 
@@ -24,8 +28,6 @@ func main() {
 	}
 
 	baseCommand := os.Args[1]
-
-	ctx := context.Background()
 
 	var (
 		signalCancel context.CancelFunc
@@ -45,5 +47,5 @@ func main() {
 		panic(fmt.Sprintf("%s command not supported", baseCommand))
 	}
 
-	slog.Info("closing main go routine...")
+	logger.Info("closing main go routine...")
 }

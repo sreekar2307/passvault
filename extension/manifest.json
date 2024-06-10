@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "PassVault Auto-Fill",
+    "version": "1.0",
+    "description": "Auto-fill passwords based on the host.",
+    "permissions": [
+        "activeTab",
+        "storage"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html"
+    }
+}
+

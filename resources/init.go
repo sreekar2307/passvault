@@ -16,5 +16,8 @@ func init() {
 		if err := initDatabaseConn(); err != nil {
 			panic(err)
 		}
+		if err := initLogger(); err != nil {
+			panic(err)
+		}
 	})
 }

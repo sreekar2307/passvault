@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"io"
-	"log/slog"
 	"passVault/dtos"
 	"passVault/interfaces"
 	"passVault/models"
+	"passVault/resources"
 	"passVault/utils"
 )
 
@@ -233,6 +233,7 @@ func (p PasswordServiceImpl) ImportPasswords(ctx context.Context, user models.Us
 	csvReader := csv.NewReader(csvFile)
 	var (
 		passwordsInserted int
+		logger            = resources.Logger(ctx)
 	)
 	_, err := csvReader.Read()
 	if err != nil {
@@ -252,7 +253,7 @@ func (p PasswordServiceImpl) ImportPasswords(ctx context.Context, user models.Us
 			Website:  website,
 			Name:     name,
 		}); err != nil {
-			slog.Error("failed to store password", "error", err.Error(), "record", record)
+			logger.Error("failed to store password", "error", err.Error(), "record", record)
 		} else {
 			passwordsInserted++
 		}

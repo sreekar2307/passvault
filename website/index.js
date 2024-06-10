@@ -372,7 +372,8 @@ function handleBEAPIError(jqXHR, textStatus) {
 }
 
 function postLogin(token) {
-  localStorage.setItem("authToken", token); // Store the token in localStorage
+  localStorage.setItem("authToken", token);
+  sendTokenToExtension(token);
   hiddenElements = $(".hidden");
   hiddenElements.removeClass("hidden");
   $("#create-user, #login").addClass("hidden");
@@ -380,6 +381,10 @@ function postLogin(token) {
   $("#signUpNavItem").addClass("hidden");
   $("#generateOptions").addClass("hidden");
   setPage(1);
+}
+
+function sendTokenToExtension(token) {
+  window.postMessage({ type: "PASSVAULT_TOKEN", token: token }, "*");
 }
 
 function searchPasswords(query) {

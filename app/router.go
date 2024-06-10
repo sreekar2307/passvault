@@ -75,7 +75,7 @@ func AccessLogMiddleware() gin.HandlerFunc {
 		c.Next()
 		end := time.Now()
 		latency := end.Sub(start)
-
+		logger := resources.Logger(c.Request.Context())
 		fields := []any{
 			slog.Int("status", c.Writer.Status()),
 			slog.String("method", c.Request.Method),
@@ -90,10 +90,10 @@ func AccessLogMiddleware() gin.HandlerFunc {
 		if len(c.Errors) > 0 {
 			// Append error field if this is an erroneous request.
 			for _, e := range c.Errors.Errors() {
-				slog.Error(e, fields...)
+				logger.Error(e, fields...)
 			}
 		} else {
-			slog.Info("", fields...)
+			logger.Info("", fields...)
 		}
 	}
 }
