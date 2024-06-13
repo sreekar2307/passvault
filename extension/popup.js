@@ -69,6 +69,14 @@ async function getAuthToken() {
   });
 }
 
+async function removeAuthToken() {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ action: "removeAuthToken" }, function () {
+      resolve();
+    });
+  });
+}
+
 async function fetchPasswords(limit, offset, query) {
   await chrome.tabs.query({ active: true, currentWindow: true });
   const token = await getAuthToken();
@@ -82,8 +90,12 @@ async function fetchPasswords(limit, offset, query) {
       Authorization: "Bearer " + token,
     },
   });
-  const data = await response.json();
-  return data.data;
+  if (response.ok) {
+    const data = await response.json();
+    return data.data;
+  } else if (response.status === 401) {
+    await removeAuthToken();
+  }
 }
 
 async function handleScroll() {

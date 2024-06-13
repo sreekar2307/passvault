@@ -29,13 +29,14 @@ window.addEventListener(
     }
     if (event.data.type && event.data.type === "PASSVAULT_TOKEN") {
       const token = event.data.token;
-      // Store the token using the Chrome Storage API
-      chrome.storage.local.set({ authToken: token }, () => {});
+      chrome.runtime.sendMessage(
+        { action: "storeAuthToken", token: token },
+        () => {},
+      );
     }
 
     if (event.data.type && event.data.type === "REMOVE_PASSVAULT_TOKEN") {
-      // Store the token using the Chrome Storage API
-      chrome.storage.local.remove("authToken");
+      chrome.runtime.sendMessage({ action: "removeAuthToken" }, () => {});
     }
   },
   false,
