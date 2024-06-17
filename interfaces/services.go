@@ -32,7 +32,11 @@ type HashService interface {
 type UserService interface {
 	CreateUser(context.Context, dtos.CreateUserParams) (string, error)
 	Login(context.Context, dtos.LoginParams) (string, error)
+	BeginWebAuthnLogin(context.Context, dtos.BeginLoginParams) (dtos.BeginLoginResult, error)
+	FinishWebAuthnLogin(context.Context, string, io.Reader) (string, error)
 	ValidateToken(context.Context, string, *models.User) error
+	BeginWebAuthnRegister(context.Context, dtos.RegisterWebAuthnUserParams) (dtos.BeginRegisterResult, error)
+	FinishWebAuthnRegister(context.Context, string, io.Reader) (string, error)
 }
 
 type BackupService interface {

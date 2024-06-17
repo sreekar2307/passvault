@@ -18,7 +18,14 @@ func NewUserRepository() interfaces.UserRepository {
 func (u UserRepositoryImpl) GetUser(ctx context.Context, db *gorm.DB, filter dtos.GetUserFilter, user *models.User) error {
 	return db.WithContext(ctx).Where(filter).Preload("UserSalt").First(user).Error
 }
+func (u UserRepositoryImpl) LastUser(ctx context.Context, db *gorm.DB, user *models.User) error {
+	return db.WithContext(ctx).Preload("UserSalt").Last(user).Error
+}
 
 func (u UserRepositoryImpl) CreateUser(ctx context.Context, db *gorm.DB, user *models.User) error {
 	return db.WithContext(ctx).Clauses(clause.Returning{}).Create(user).Error
+}
+
+func (u UserRepositoryImpl) UpdateUser(ctx context.Context, db *gorm.DB, filter dtos.GetUserFilter, user *models.User) error {
+	return db.WithContext(ctx).Clauses(clause.Returning{}).Where(filter).Updates(user).Error
 }

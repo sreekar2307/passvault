@@ -7,7 +7,8 @@ var fetchedPages = new Set();
 var searchQuery = "";
 var currentPasswordRequest;
 var beEndpoint = "https://www.passvault.fun/api/v1";
-var googleCaptchaToken = "6LeWMPMpAAAAALl9Ik6bEJfafcLoo4TX1-2t_atM";
+var beEndpointV2 = "https://www.passvault.fun/api/v2";
+var passKeyCreationAllowed = false;
 
 function loginNavClick() {
   $("#login").removeClass("hidden");
@@ -216,31 +217,123 @@ function submitCreateuserForm() {
   var createUserData = {
     email: $("#createUserEmail").val(),
     name: $("#createUserUsername").val(),
-    password: $("#createUserPassword").val(),
-    confirmPassword: $("#createUserConfirmPassword").val(),
   };
   createUser(createUserData);
 }
 
 function createUser(createUserData) {
-  getCaptchaToken(function (token) {
-    createUserData.token = token;
-    $.ajax({
-      url: beEndpoint + "/users",
-      method: "POST",
-      contentType: "application/json",
-      data: JSON.stringify(createUserData),
-      success: function (response) {
-        if (response.token) {
-          postLogin(response.token);
-        }
-      },
-      error: function (jqXHR, textStatus) {
-        // Handle error response if needed
-        handleBEAPIError(jqXHR, textStatus);
-      },
-    });
+  // getCaptchaToken(function (token) {
+  //   createUserData.token = token;
+  //
+  // });
+  $.ajax({
+    url: beEndpointV2 + "/begin/register",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(createUserData),
+    success: async function (response) {
+      if (response.token) {
+        postLogin(response.token);
+      }
+      let dataDecoded = response.credOptions;
+      dataDecoded.publicKey.challenge = base64ToArrayBuffer(
+        dataDecoded.publicKey.challenge,
+      );
+      dataDecoded.publicKey.user.id = base64ToArrayBuffer(
+        dataDecoded.publicKey.user.id,
+      );
+      const credential = await navigator.credentials.create(dataDecoded);
+      console.log("printing credentials", credential);
+      sendCredentialToBE(credential, response.sessionID);
+    },
+    error: function (jqXHR, textStatus) {
+      // Handle error response if needed
+      handleBEAPIError(jqXHR, textStatus);
+    },
   });
+}
+
+// Function to convert ArrayBuffer to Base64
+function arrayBufferToBase64(buffer) {
+  // Create a Uint8Array from the ArrayBuffer
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+
+  // Convert each byte to a binary string
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+
+  // Convert the binary string to a Base64 encoded string
+  const base64String = window.btoa(binary);
+
+  // Make the Base64 string URL-safe by replacing non-URL-safe characters
+  const urlSafeBase64 = base64String
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+
+  return urlSafeBase64;
+}
+
+function sendCredentialToBE(credential, sessionID) {
+  $.ajax({
+    url: beEndpointV2 + "/finish/register" + "?session_id=" + sessionID,
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+      rawId: arrayBufferToBase64(credential.rawId),
+      id: credential.id,
+      type: credential.type,
+      response: {
+        clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+        attestationObject: arrayBufferToBase64(
+          credential.response.attestationObject,
+        ),
+      },
+      authenticatorAttachment: credential.authenticatorAttachment,
+    }),
+    success: async function (response) {
+      if (response.token) {
+        postLogin(response.token);
+      }
+    },
+    error: function (jqXHR, textStatus) {
+      // Handle error response if needed
+      handleBEAPIError(jqXHR, textStatus);
+    },
+  });
+}
+
+function base64Decode(input) {
+  // Replace non-url compatible chars with base64 standard chars
+  input = input.replace(/-/g, "+").replace(/_/g, "/");
+
+  // Pad out with standard base64 required padding characters
+  var pad = input.length % 4;
+  if (pad) {
+    if (pad === 1) {
+      throw new Error(
+        "InvalidLengthError: Input base64url string is the wrong length to determine padding",
+      );
+    }
+    input += new Array(5 - pad).join("=");
+  }
+
+  return atob(input);
+}
+
+function base64ToArrayBuffer(base64) {
+  return stringAsBytes(base64Decode(base64));
+}
+
+function stringAsBytes(str) {
+  var bytes = new Uint8Array(str.length);
+  for (var i = 0; i < str.length; i++) {
+    bytes[i] = str.charCodeAt(i);
+  }
+  return bytes.buffer;
 }
 
 $("#importPasswordForm").submit(function (e) {
@@ -399,25 +492,42 @@ function searchPasswords(query) {
   setPage(1);
 }
 
-function getCaptchaToken(callback) {
-  grecaptcha.ready(function () {
-    grecaptcha
-      .execute(googleCaptchaToken, {
-        action: "submit",
-      })
-      .then(function (token) {
-        callback(token);
-      })
-      .catch(function (error) {
-        alert(error);
-      });
-  });
-}
+// function getCaptchaToken(callback) {
+//   grecaptcha.ready(function () {
+//     grecaptcha
+//       .execute(googleCaptchaToken, {
+//         action: "submit",
+//       })
+//       .then(function (token) {
+//         callback(token);
+//       })
+//       .catch(function (error) {
+//         alert(error);
+//       });
+//   });
+// }
 
 $(document).ready(function () {
   if (localStorage.getItem("authToken")) {
     postLogin(localStorage.getItem("authToken"));
   }
+
+  if (
+    window.PublicKeyCredential &&
+    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable &&
+    PublicKeyCredential.isConditionalMediationAvailable
+  ) {
+    // Check if user verifying platform authenticator is available.
+    Promise.all([
+      PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+      PublicKeyCredential.isConditionalMediationAvailable(),
+    ]).then((results) => {
+      if (results.every((r) => r === true)) {
+        passKeyCreationAllowed = true;
+      }
+    });
+  }
+
   const toggleLoginIconSpan = $("#toggleLoginPassword");
   const toggleCreateUserIconSpan = $("#toggleCreateUserPassword");
   const toggleCreateUserConfirmIconSpan = $("#toggleCreateUserConfirmPassword");
@@ -506,30 +616,79 @@ $(document).ready(function () {
 
   $("#loginForm").submit(function (event) {
     event.preventDefault();
-    getCaptchaToken(function (token) {
-      var email = $("#loginEmail").val();
-      var password = $("#loginPassword").val();
+    var email = $("#loginEmail").val();
 
-      $.ajax({
-        url: beEndpoint + "/login/users", // Replace with your backend API URL
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({
-          email: email,
-          password: password,
-          token: token,
-        }),
-        success: function (response) {
-          if (response.token) {
-            postLogin(response.token);
-          } else {
-            alert("Login failed. Please try again.");
+    $.ajax({
+      url: beEndpointV2 + "/begin/login",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        email: email,
+      }),
+      success: async function (response) {
+        if (response.credAssertion) {
+          let dataDecoded = response.credAssertion;
+          dataDecoded.publicKey.challenge = base64ToArrayBuffer(
+            dataDecoded.publicKey.challenge,
+          );
+          for (
+            let i = 0;
+            i < dataDecoded.publicKey.allowCredentials.length;
+            i++
+          ) {
+            dataDecoded.publicKey.allowCredentials[i].id = base64ToArrayBuffer(
+              dataDecoded.publicKey.allowCredentials[i].id,
+            );
           }
-        },
-        error: function () {
-          alert("Login failed. Please try again.");
-        },
-      });
+
+          await finishLogin(
+            response.credAssertion.publicKey,
+            response.sessionID,
+          );
+        }
+      },
+      error: function () {
+        alert("Login failed. Please try again.");
+      },
     });
   });
 });
+
+async function finishLogin(publicKeyOptions, sessionID) {
+  const credential = await navigator.credentials.get({
+    publicKey: publicKeyOptions,
+  });
+
+  console.log("printing credentials", credential);
+  let credentialParsed = {
+    id: credential.id,
+    type: credential.type,
+    authenticatorAttachment: credential.authenticatorAttachment,
+    rawId: arrayBufferToBase64(credential.rawId),
+    response: {
+      clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+      authenticatorData: arrayBufferToBase64(
+        credential.response.authenticatorData,
+      ),
+      userHandle: arrayBufferToBase64(credential.response.userHandle),
+      signature: arrayBufferToBase64(credential.response.signature),
+    },
+  };
+
+  $.ajax({
+    url: beEndpointV2 + "/finish/login" + "?session_id=" + sessionID,
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify(credentialParsed),
+    success: function (response) {
+      if (response.token) {
+        postLogin(response.token);
+      } else {
+        alert("Login failed. Please try again.");
+      }
+    },
+    error: function () {
+      alert("Login failed. Please try again.");
+    },
+  });
+}

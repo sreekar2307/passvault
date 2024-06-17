@@ -59,10 +59,12 @@ func SetupRouter(ctx context.Context) *gin.Engine {
 	var (
 		api = router.Group("/api")
 		v1  = api.Group("/v1")
+		v2  = api.Group("/v2")
 	)
 
 	SetUpPasswordsEndpoints(v1)
 	SetUpUsersEndpoints(v1)
+	SetUpUsersEndpointsV2(v2)
 
 	return router
 }
@@ -140,6 +142,19 @@ func SetUpUsersEndpoints(router *gin.RouterGroup) {
 	{
 		users.POST("", CreateUser(dependencies.UserService))
 	}
+
+}
+
+func SetUpUsersEndpointsV2(router *gin.RouterGroup) {
+
+	var (
+		dependencies = dependency.Dependencies()
+	)
+
+	router.POST("/begin/login", BeginLoginUser(dependencies.UserService))
+	router.POST("/finish/login", FinishLoginUser(dependencies.UserService))
+	router.POST("/begin/register", BeginRegisterUser(dependencies.UserService))
+	router.POST("/finish/register", FinishRegisterUser(dependencies.UserService))
 
 }
 

@@ -12,12 +12,7 @@ import (
 )
 
 func initDatabaseConn() error {
-	var (
-		openDBOpts []stdlib.OptionOpenDB
-		dsn        string
-	)
-
-	dsn = fmt.Sprintf(
+	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
 		config.GetString(dtos.ConfigKeys.Database.Host),
 		config.GetString(dtos.ConfigKeys.Database.Username),
@@ -30,7 +25,7 @@ func initDatabaseConn() error {
 		return err
 	}
 
-	sqlDB := stdlib.OpenDB(*pgxConnConfig, openDBOpts...)
+	sqlDB := stdlib.OpenDB(*pgxConnConfig)
 
 	sqlDB.SetMaxOpenConns(config.GetInt(dtos.ConfigKeys.Database.MaxOpenConnections))
 	sqlDB.SetMaxIdleConns(config.GetInt(dtos.ConfigKeys.Database.MaxIdleConnections))

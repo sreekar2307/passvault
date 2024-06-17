@@ -24,6 +24,8 @@ type Dependency struct {
 	PasswordVersionRepo    interfaces.PasswordVersionRepository
 	UserSaltRepo           interfaces.UserSaltRepository
 	UserRepo               interfaces.UserRepository
+	WepAuthnCredentialRepo interfaces.WebAuthnCredentialRepository
+	WepAuthnSessionRepo    interfaces.WebAuthnSessionRepository
 
 	PasswordService interfaces.PasswordService
 	UserService     interfaces.UserService
@@ -54,6 +56,8 @@ func newDependencies() Dependency {
 		PasswordRepo:           repository.NewPasswordRepository(),
 		PasswordGenerationRepo: repository.NewPasswordGenerationRepository(),
 		PasswordVersionRepo:    repository.NewPasswordVersionRepository(),
+		WepAuthnCredentialRepo: repository.NewWebAuthnCredentialRepository(),
+		WepAuthnSessionRepo:    repository.NewWebAuthnSessionRepository(),
 		UserSaltRepo:           repository.NewUserSaltRepository(),
 		UserRepo:               repository.NewUserRepository(),
 		DB:                     db,
@@ -70,7 +74,8 @@ func newDependencies() Dependency {
 		dependencies.PasswordGenerationRepo, dependencies.PasswordVersionRepo,
 		dependencies.EncryptService, dependencies.HashService)
 	dependencies.UserService = services.NewUserService(db, dependencies.EncryptService, dependencies.HashService,
-		dependencies.UserRepo, dependencies.UserSaltRepo, dependencies.CaptchaService)
+		dependencies.UserRepo, dependencies.UserSaltRepo, dependencies.CaptchaService,
+		dependencies.WepAuthnCredentialRepo, dependencies.WepAuthnSessionRepo)
 
 	dependencies.BackupService = services.NewBackupService(
 		resources.NewS3(config.GetString(dtos.ConfigKeys.DatabaseBackup.Region)),

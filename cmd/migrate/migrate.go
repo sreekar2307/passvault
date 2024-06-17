@@ -28,6 +28,8 @@ func Migrate(ctx context.Context, args ...string) {
 		&models.Password{},
 		&models.PasswordGenerationHistory{},
 		&models.PasswordVersion{},
+		&models.WebauthNCredential{},
+		&models.WebauthNSession{},
 	); err != nil {
 		panic(err.Error())
 	}
