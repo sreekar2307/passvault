@@ -12,7 +12,7 @@ func WebAuthn() *webauthn.WebAuthn {
 
 func initWebAuthIn() (err error) {
 	webAuthn, err = webauthn.New(&webauthn.Config{
-		RPID:          "localhost",
+		RPID:          "passvault.fun",
 		RPDisplayName: "PassVault",
 		RPOrigins: []string{
 			"https://www.passvault.fun",
