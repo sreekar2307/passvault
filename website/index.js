@@ -617,14 +617,16 @@ $(document).ready(function () {
   $("#loginForm").submit(function (event) {
     event.preventDefault();
     var email = $("#loginEmail").val();
+    var password = $("#loginPassword").val();
     getCaptchaToken(function (token) {
-      createUserData.token = token;
       $.ajax({
         url: beEndpoint + "/login",
         method: "POST",
         contentType: "application/json",
         data: JSON.stringify({
           email: email,
+          password: password,
+          token: token,
         }),
         success: async function (response) {
           postLogin(response.token);
