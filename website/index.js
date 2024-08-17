@@ -7,9 +7,9 @@ var fetchedPages = new Set();
 var searchQuery = "";
 var currentPasswordRequest;
 var beEndpoint = "https://www.passvault.fun/api/v1";
-var beEndpointV2 = "https://www.passvault.fun/api/v2";
+var beEndpoint = "https://www.passvault.fun/api/v2";
 var passKeyCreationAllowed = false;
-
+var googleCaptchaToken = "6LeWMPMpAAAAALl9Ik6bEJfafcLoo4TX1-2t_atM";
 function loginNavClick() {
   $("#login").removeClass("hidden");
   $("#create-user").addClass("hidden");
@@ -222,34 +222,34 @@ function submitCreateuserForm() {
 }
 
 function createUser(createUserData) {
-  // getCaptchaToken(function (token) {
-  //   createUserData.token = token;
-  //
-  // });
-  $.ajax({
-    url: beEndpointV2 + "/begin/register",
-    method: "POST",
-    contentType: "application/json",
-    data: JSON.stringify(createUserData),
-    success: async function (response) {
-      if (response.token) {
-        postLogin(response.token);
-      }
-      let dataDecoded = response.credOptions;
-      dataDecoded.publicKey.challenge = base64ToArrayBuffer(
-        dataDecoded.publicKey.challenge,
-      );
-      dataDecoded.publicKey.user.id = base64ToArrayBuffer(
-        dataDecoded.publicKey.user.id,
-      );
-      const credential = await navigator.credentials.create(dataDecoded);
-      console.log("printing credentials", credential);
-      sendCredentialToBE(credential, response.sessionID);
-    },
-    error: function (jqXHR, textStatus) {
-      // Handle error response if needed
-      handleBEAPIError(jqXHR, textStatus);
-    },
+  getCaptchaToken(function (token) {
+    createUserData.token = token;
+
+    $.ajax({
+      url: beEndpoint + "/users",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(createUserData),
+      success: async function (response) {
+        if (response.token) {
+          postLogin(response.token);
+        }
+        //let dataDecoded = response.credOptions;
+        //dataDecoded.publicKey.challenge = base64ToArrayBuffer(
+        //  dataDecoded.publicKey.challenge,
+        //);
+        //dataDecoded.publicKey.user.id = base64ToArrayBuffer(
+        //  dataDecoded.publicKey.user.id,
+        //);
+        //const credential = await navigator.credentials.create(dataDecoded);
+        //console.log("printing credentials", credential);
+        //sendCredentialToBE(credential, response.sessionID);
+      },
+      error: function (jqXHR, textStatus) {
+        // Handle error response if needed
+        handleBEAPIError(jqXHR, textStatus);
+      },
+    });
   });
 }
 
@@ -279,7 +279,7 @@ function arrayBufferToBase64(buffer) {
 
 function sendCredentialToBE(credential, sessionID) {
   $.ajax({
-    url: beEndpointV2 + "/finish/register" + "?session_id=" + sessionID,
+    url: beEndpoint + "/finish/register" + "?session_id=" + sessionID,
     method: "POST",
     contentType: "application/json",
     data: JSON.stringify({
@@ -492,20 +492,20 @@ function searchPasswords(query) {
   setPage(1);
 }
 
-// function getCaptchaToken(callback) {
-//   grecaptcha.ready(function () {
-//     grecaptcha
-//       .execute(googleCaptchaToken, {
-//         action: "submit",
-//       })
-//       .then(function (token) {
-//         callback(token);
-//       })
-//       .catch(function (error) {
-//         alert(error);
-//       });
-//   });
-// }
+function getCaptchaToken(callback) {
+  grecaptcha.ready(function () {
+    grecaptcha
+      .execute(googleCaptchaToken, {
+        action: "submit",
+      })
+      .then(function (token) {
+        callback(token);
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  });
+}
 
 $(document).ready(function () {
   if (localStorage.getItem("authToken")) {
@@ -617,39 +617,42 @@ $(document).ready(function () {
   $("#loginForm").submit(function (event) {
     event.preventDefault();
     var email = $("#loginEmail").val();
+    getCaptchaToken(function (token) {
+      createUserData.token = token;
+      $.ajax({
+        url: beEndpoint + "/login",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+          email: email,
+        }),
+        success: async function (response) {
+          postLogin(response.token);
+          //if (response.credAssertion) {
+          //  let dataDecoded = response.credAssertion;
+          //  dataDecoded.publicKey.challenge = base64ToArrayBuffer(
+          //    dataDecoded.publicKey.challenge,
+          //  );
+          //  for (
+          //    let i = 0;
+          //    i < dataDecoded.publicKey.allowCredentials.length;
+          //    i++
+          //  ) {
+          //    dataDecoded.publicKey.allowCredentials[i].id = base64ToArrayBuffer(
+          //      dataDecoded.publicKey.allowCredentials[i].id,
+          //    );
+          //  }
 
-    $.ajax({
-      url: beEndpointV2 + "/begin/login",
-      method: "POST",
-      contentType: "application/json",
-      data: JSON.stringify({
-        email: email,
-      }),
-      success: async function (response) {
-        if (response.credAssertion) {
-          let dataDecoded = response.credAssertion;
-          dataDecoded.publicKey.challenge = base64ToArrayBuffer(
-            dataDecoded.publicKey.challenge,
-          );
-          for (
-            let i = 0;
-            i < dataDecoded.publicKey.allowCredentials.length;
-            i++
-          ) {
-            dataDecoded.publicKey.allowCredentials[i].id = base64ToArrayBuffer(
-              dataDecoded.publicKey.allowCredentials[i].id,
-            );
-          }
-
-          await finishLogin(
-            response.credAssertion.publicKey,
-            response.sessionID,
-          );
-        }
-      },
-      error: function () {
-        alert("Login failed. Please try again.");
-      },
+          //await finishLogin(
+          //  response.credAssertion.publicKey,
+          //  response.sessionID,
+          //);
+          //}
+        },
+        error: function () {
+          alert("Login failed. Please try again.");
+        },
+      });
     });
   });
 });
@@ -676,7 +679,7 @@ async function finishLogin(publicKeyOptions, sessionID) {
   };
 
   $.ajax({
-    url: beEndpointV2 + "/finish/login" + "?session_id=" + sessionID,
+    url: beEndpoint + "/finish/login" + "?session_id=" + sessionID,
     method: "POST",
     contentType: "application/json",
     data: JSON.stringify(credentialParsed),

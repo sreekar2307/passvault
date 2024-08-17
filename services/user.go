@@ -248,11 +248,11 @@ func (u UserServiceImpl) FinishWebAuthnRegister(ctx context.Context, sessionIDSt
 func (u UserServiceImpl) Login(ctx context.Context, params dtos.LoginParams) (string, error) {
 	var user models.User
 
-	// if ok, err := u.captchaService.VerifyToken(ctx, params.Token); err != nil {
-	// 	return "", err
-	// } else if !ok {
-	// 	return "", errors.New("invalid captcha")
-	// }
+	if ok, err := u.captchaService.VerifyToken(ctx, params.Token); err != nil {
+		return "", err
+	} else if !ok {
+		return "", errors.New("invalid captcha")
+	}
 
 	if err := u.userRepository.GetUser(ctx, u.db, dtos.GetUserFilter{Email: params.Email}, &user); err != nil {
 		return "", err
