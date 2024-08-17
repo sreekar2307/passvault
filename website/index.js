@@ -7,7 +7,6 @@ var fetchedPages = new Set();
 var searchQuery = "";
 var currentPasswordRequest;
 var beEndpoint = "https://www.passvault.fun/api/v1";
-var beEndpoint = "https://www.passvault.fun/api/v2";
 var passKeyCreationAllowed = false;
 var googleCaptchaToken = "6LeWMPMpAAAAALl9Ik6bEJfafcLoo4TX1-2t_atM";
 function loginNavClick() {
