@@ -619,7 +619,7 @@ $(document).ready(function () {
     var password = $("#loginPassword").val();
     getCaptchaToken(function (token) {
       $.ajax({
-        url: beEndpoint + "/login",
+        url: beEndpoint + "/login/users",
         method: "POST",
         contentType: "application/json",
         data: JSON.stringify({
