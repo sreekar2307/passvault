@@ -16,7 +16,7 @@ type RegisterWebAuthnUserParams struct {
 type LoginParams struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
-	Token    string `json:"token" binding:"required"`
+	Token    string `json:"token"`
 }
 
 type BeginLoginParams struct {

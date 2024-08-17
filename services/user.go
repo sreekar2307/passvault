@@ -5,17 +5,18 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"github.com/go-webauthn/webauthn/protocol"
-	"github.com/go-webauthn/webauthn/webauthn"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"io"
 	"passVault/dtos"
 	"passVault/interfaces"
 	"passVault/models"
 	"passVault/resources"
 	"time"
+
+	"github.com/go-webauthn/webauthn/protocol"
+	"github.com/go-webauthn/webauthn/webauthn"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type UserServiceImpl struct {
@@ -88,7 +89,6 @@ func (u UserServiceImpl) CreateUser(ctx context.Context, params dtos.CreateUserP
 			return err
 		}
 		return nil
-
 	}); err != nil {
 		return "", err
 	}
@@ -128,7 +128,6 @@ func (u UserServiceImpl) BeginWebAuthnRegister(ctx context.Context, params dtos.
 			return err
 		}
 		return nil
-
 	}); err != nil {
 		return dtos.BeginRegisterResult{}, err
 	}
@@ -140,7 +139,7 @@ func (u UserServiceImpl) BeginWebAuthnRegister(ctx context.Context, params dtos.
 	if err != nil {
 		return dtos.BeginRegisterResult{}, err
 	}
-	var webAuthNSession = models.WebauthNSession{
+	webAuthNSession := models.WebauthNSession{
 		UserID: user.ID,
 		SessionData: models.SessionData{
 			Challenge:        session.Challenge,
@@ -163,7 +162,7 @@ func (u UserServiceImpl) BeginWebAuthnRegister(ctx context.Context, params dtos.
 	if err != nil {
 		return dtos.BeginRegisterResult{}, err
 	}
-	var resp = dtos.BeginRegisterResult{
+	resp := dtos.BeginRegisterResult{
 		CredOptions: creation,
 		SessionID:   webAuthNSession.SessionID.String(),
 	}
@@ -249,11 +248,11 @@ func (u UserServiceImpl) FinishWebAuthnRegister(ctx context.Context, sessionIDSt
 func (u UserServiceImpl) Login(ctx context.Context, params dtos.LoginParams) (string, error) {
 	var user models.User
 
-	if ok, err := u.captchaService.VerifyToken(ctx, params.Token); err != nil {
-		return "", err
-	} else if !ok {
-		return "", errors.New("invalid captcha")
-	}
+	// if ok, err := u.captchaService.VerifyToken(ctx, params.Token); err != nil {
+	// 	return "", err
+	// } else if !ok {
+	// 	return "", errors.New("invalid captcha")
+	// }
 
 	if err := u.userRepository.GetUser(ctx, u.db, dtos.GetUserFilter{Email: params.Email}, &user); err != nil {
 		return "", err
@@ -298,7 +297,7 @@ func (u UserServiceImpl) BeginWebAuthnLogin(ctx context.Context, params dtos.Beg
 	if err != nil {
 		return dtos.BeginLoginResult{}, err
 	}
-	var webAuthNSession = models.WebauthNSession{
+	webAuthNSession := models.WebauthNSession{
 		UserID: user.ID,
 		SessionData: models.SessionData{
 			Challenge:        session.Challenge,
@@ -406,7 +405,6 @@ func (u UserServiceImpl) FinishWebAuthnLogin(ctx context.Context, sessionIDStr s
 			}
 			break
 		}
-
 	}
 
 	token, err := u.newToken(ctx, session.User)
